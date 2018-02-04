@@ -132,5 +132,6 @@ if (require.main === module) {
   if (sorted !== packageJson) {
     fs.writeFileSync(packageJsonPath, sorted, 'utf8');
     console.log('Ok, your package.json is sorted');
+    console.info(packageJsonPath);
   }
 }
