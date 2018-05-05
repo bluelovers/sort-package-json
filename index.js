@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 var sortObjectKeys = require('sort-object-keys');
+var detectIndent = require('detect-indent');
 function sortPackageJson(packageJson) {
   var wasString = false;
   var endCharacters = '';
+  var indentLevel = 2;
   if (typeof packageJson === 'string') {
     wasString = true;
+    indentLevel = detectIndent(packageJson).indent;
     if (packageJson.substr(-1) === '\n') {
       endCharacters = '\n';
     }
@@ -61,6 +64,9 @@ function sortPackageJson(packageJson) {
   sortSubKey('browserify');
   sortSubKey('babel');
   sortSubKey('eslintConfig');
+  sortSubKey('jest');
+  sortSubKey('xo');
+  sortSubKey('prettier');
   sortSubKey('dependencies');
   sortSubKey('devDependencies');
   sortSubKey('peerDependencies');
@@ -105,8 +111,12 @@ function sortPackageJson(packageJson) {
     'browser',
     'browserify',
     'babel',
+    'xo',
+    'prettier',
     'eslintConfig',
+    'eslintIgnore',
     'stylelint',
+    'jest',
     'dependencies',
     'devDependencies',
     'peerDependencies',
@@ -120,18 +130,22 @@ function sortPackageJson(packageJson) {
     'preferGlobal',
     'publishConfig',
   ]);
-  return wasString ? JSON.stringify(packageJson, null, 2) + endCharacters : packageJson;
+  return wasString ? JSON.stringify(packageJson, null, indentLevel) + endCharacters : packageJson;
 }
 module.exports = sortPackageJson;
 module.exports.sortPackageJson = sortPackageJson;
+
 if (require.main === module) {
   var fs = require('fs');
-  var packageJsonPath = process.cwd() + '/package.json';
-  var packageJson = fs.readFileSync(packageJsonPath, 'utf8');
-  var sorted = sortPackageJson(packageJson);
-  if (sorted !== packageJson) {
-    fs.writeFileSync(packageJsonPath, sorted, 'utf8');
-    console.log('Ok, your package.json is sorted');
-    console.info(packageJsonPath);
-  }
+
+  var filesToProcess = process.argv[2] ? process.argv.slice(2) : [process.cwd() + '/package.json'];
+
+  filesToProcess.forEach(function (filePath) {
+    var packageJson = fs.readFileSync(filePath, 'utf8');
+    var sorted = sortPackageJson(packageJson);
+    if (sorted !== packageJson) {
+        fs.writeFileSync(filePath, sorted, 'utf8');
+        console.log(filePath + ' is sorted!');
+    }
+  });
 }

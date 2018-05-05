@@ -50,6 +50,7 @@
     "test": "node test.js"
   },
   "dependencies": {
+    "detect-indent": "^5.0.0",
     "sort-object-keys": "^1.1.1"
   },
   "devDependencies": {}
